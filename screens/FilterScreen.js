@@ -4,6 +4,8 @@ import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 
 import CustomHeaderButton from '../components/HeaderButton';
 import Colors from '../constants/Colors';
+import { useDispatch } from 'react-redux';
+import { setFilter } from '../store/actions/meals';
 
 const FilterSwitch = (props) => (
   <View style={styles.filterContainer}>
@@ -23,25 +25,25 @@ const FilterScreen = (props) => {
   const [isVegan, setIsVegan] = useState(false);
   const [isVegeterian, setIsVegeterian] = useState(false);
 
-  const saveFilters = useCallback(() => {
-    const appliedFilters = {
-      glutenFree: isGlutenFree,
-      lactoseFree: isLactoseFree,
-      vegan: isVegan,
-      vegetarian: isVegeterian,
-    };
-    console.log(appliedFilters);
-  }, [isGlutenFree, isLactoseFree, isVegan, isVegeterian]);
+  const dispatch = useDispatch();
+
+  const setFilterHandler = useCallback(() => {
+    dispatch(
+      setFilter({
+        glutenFree: isGlutenFree,
+        lactoseFree: isLactoseFree,
+        vegan: isVegan,
+        vegetarian: isVegeterian,
+      })
+    );
+  }, [isGlutenFree, isLactoseFree, isVegeterian, isVegan, dispatch]);
 
   useEffect(() => {
-    props.navigation.setParams({
-      save: saveFilters,
-    });
-  }, [saveFilters]);
+    props.navigation.setParams({ saveFilter: setFilterHandler });
+  }, [setFilterHandler]);
 
-  console.log('re render');
   return (
-    <View style={stfyles.screen}>
+    <View style={styles.screen}>
       <Text style={styles.title}>Available Filters / Restrictions</Text>
       <FilterSwitch
         label='Gluten-free'
@@ -86,7 +88,7 @@ FilterScreen.navigationOptions = (navData) => {
           iconName='ios-save'
           iconSize={24}
           title='save'
-          onPress={navData.navigation.getParam('save')}
+          onPress={navData.navigation.getParam('saveFilter')}
         />
       </HeaderButtons>
     ),
